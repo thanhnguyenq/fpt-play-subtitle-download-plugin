@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         FPT Play Subtitle Downloader [VTT]
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Download subtitle from FPT Play
 // @author       Chiefileum
 // @match        https://fptplay.vn/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fptplay.vn
 // @run-at       document-start
+// @updateURL    https://github.com/thanhnguyenq/fpt-play-subtitle-download-plugin/raw/main/download.user.js
+// @downloadURL  https://github.com/thanhnguyenq/fpt-play-subtitle-download-plugin/raw/main/download.user.js
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
