@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FPT Play Subtitle Downloader [VTT]
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  Download subtitle from FPT Play
 // @author       Chiefileum
 // @match        https://fptplay.vn/*
@@ -13,6 +13,7 @@
 (function() {
     'use strict';
     const downloadBtnId = 'chiefileum_download_btn';
+    var fileName = '';
 
     function getVTTSubtitle(url, callBackFn) {
         GM_xmlhttpRequest ({
@@ -36,7 +37,7 @@
 
         const newButton = document.createElement('a');
         newButton.textContent = 'Download Sub';
-        newButton.download = `${document.title}.vtt`;
+        newButton.download = fileName;
         newButton.href = URL.createObjectURL(blob);
         newButton.id = downloadBtnId;
         newButton.className ='resolution-switcher';
@@ -48,6 +49,7 @@
     const oldSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function(){
         if(this.url && this.url.endsWith(".vtt")) {
+            fileName = this.url.split("/").at(-1);
             getVTTSubtitle(this.url, createDownloadButton);
         }
         oldSend.apply(this, arguments);
