@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FPT Play Subtitle Downloader [VTT]
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  Download subtitle from FPT Play
 // @author       Chiefileum
 // @match        https://fptplay.vn/*
@@ -15,7 +15,26 @@
 (function() {
     'use strict';
     const downloadBtnId = 'chiefileum_download_btn';
-    var fileName = '';
+
+    function waitForElm(selector) {
+        return new Promise(resolve => {
+            if (document.querySelector(selector)) {
+                return resolve(document.querySelector(selector));
+            }
+
+            const observer = new MutationObserver(mutations => {
+                if (document.querySelector(selector)) {
+                    observer.disconnect();
+                    resolve(document.querySelector(selector));
+                }
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    }
 
     function getVTTSubtitle(url, callBackFn) {
         GM_xmlhttpRequest ({
@@ -39,11 +58,22 @@
 
         const newButton = document.createElement('a');
         newButton.textContent = 'Download Sub';
-        newButton.download = fileName;
         newButton.href = URL.createObjectURL(blob);
         newButton.id = downloadBtnId;
         newButton.className ='resolution-switcher';
 
+
+        waitForElm(".vjs-control-bar").then((elm) => {
+            // Get file name
+            newButton.download = document.getElementsByClassName('frames__background__active')[0]
+                .parentNode
+                .parentNode
+                .getElementsByClassName('frames__content__info__title')[0]
+                .title.replace(/[/\\?%*:|"<>]/g, '') + '.vtt';
+
+            // Create button
+            elm.appendChild(newButton);
+        });
         var node = document.getElementsByClassName('vjs-control-bar')[0];
         node.appendChild(newButton);
     }
@@ -51,7 +81,6 @@
     const oldSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function(){
         if(this.url && this.url.endsWith(".vtt")) {
-            fileName = this.url.split("/").at(-1);
             getVTTSubtitle(this.url, createDownloadButton);
         }
         oldSend.apply(this, arguments);
