@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FPT Play Subtitle Downloader [VTT]
-// @namespace    http://tampermonkey.net/
-// @version      0.4
+// @namespace    https://www.facebook.com/vnanime.net/
+// @version      0.5
 // @description  Download subtitle from FPT Play
 // @author       Chiefileum
 // @match        https://fptplay.vn/*
@@ -69,7 +69,9 @@
                 .parentNode
                 .parentNode
                 .getElementsByClassName('frames__content__info__title')[0]
-                .title.replace(/[/\\?%*:|"<>]/g, '') + '.vtt';
+                .title
+                .replace(/[:]/g, '-')
+                .replace(/[/\\?%*:|"<>]/g, '') + '.vtt';
 
             // Create button
             elm.appendChild(newButton);
