@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FPT Play Subtitle Downloader [VTT]
 // @namespace    https://www.facebook.com/vnanime.net/
-// @version      0.5
+// @version      0.6
 // @description  Download subtitle from FPT Play
 // @author       Chiefileum
 // @match        https://fptplay.vn/*
@@ -63,7 +63,7 @@
         newButton.className ='resolution-switcher';
 
 
-        waitForElm(".vjs-control-bar").then((elm) => {
+        waitForElm(".shaka-bottom-controls").then((elm) => {
             // Get file name
             newButton.download = document.getElementsByClassName('frames__background__active')[0]
                 .parentNode
@@ -72,19 +72,30 @@
                 .title
                 .replace(/[:]/g, '-')
                 .replace(/[/\\?%*:|"<>]/g, '') + '.vtt';
-
-            // Create button
-            elm.appendChild(newButton);
         });
-        var node = document.getElementsByClassName('vjs-control-bar')[0];
+        var node = document.getElementsByClassName('shaka-controls-button-panel')[0];
         node.appendChild(newButton);
     }
 
-    const oldSend = XMLHttpRequest.prototype.send;
-    XMLHttpRequest.prototype.send = function(){
-        if(this.url && this.url.endsWith(".vtt")) {
-            getVTTSubtitle(this.url, createDownloadButton);
+    // const oldSend = XMLHttpRequest.prototype.send;
+    // XMLHttpRequest.prototype.send = function(){
+    //     if(this.url && this.url.endsWith(".vtt")) {
+    //          getVTTSubtitle(this.url, createDownloadButton);
+    //      }
+    //      oldSend.apply(this, arguments);
+    //  }
+
+    const constantMock = window.fetch;
+    unsafeWindow.fetch = function() {
+        // Get the parameter in arguments
+        // Intercept the parameter here
+        for (const arg of arguments) {
+            if (typeof arg === 'string' || arg instanceof String) {
+                if(arg.endsWith(".vtt")){
+                    getVTTSubtitle(arg, createDownloadButton);
+                }
+            }
         }
-        oldSend.apply(this, arguments);
+        return constantMock.apply(this, arguments)
     }
 })();
