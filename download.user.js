@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FPT Play Subtitle Downloader [VTT]
 // @namespace    https://www.facebook.com/vnanime.net/
-// @version      0.6
+// @version      0.7
 // @description  Download subtitle from FPT Play
 // @author       Chiefileum
 // @match        https://fptplay.vn/*
@@ -47,9 +47,7 @@
     }
 
     function createDownloadButton(data) {
-        var blob = new Blob([data], {
-            type: 'text/vtt'
-        });
+        var blob = new Blob([data]);
 
         if(document.getElementById(downloadBtnId)) {
             document.getElementById(downloadBtnId).href = URL.createObjectURL(blob);
@@ -65,13 +63,13 @@
 
         waitForElm(".shaka-bottom-controls").then((elm) => {
             // Get file name
-            newButton.download = document.getElementsByClassName('frames__background__active')[0]
+            newButton.download = document.getElementsByClassName('frames__background__active')[0] ? document.getElementsByClassName('frames__background__active')[0]
                 .parentNode
                 .parentNode
                 .getElementsByClassName('frames__content__info__title')[0]
                 .title
                 .replace(/[:]/g, '-')
-                .replace(/[/\\?%*:|"<>]/g, '') + '.vtt';
+                .replace(/[/\\?%*:|"<>]/g, '') + '.vtt' : 'vna.vtt';
         });
         var node = document.getElementsByClassName('shaka-controls-button-panel')[0];
         node.appendChild(newButton);
