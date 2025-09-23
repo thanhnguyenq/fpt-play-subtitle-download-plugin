@@ -1,3 +1,5 @@
+const subtitleBlobs = new Map();
+
 // Setup popup window
 function createVNAWindow() {
   const jsFrame = new JSFrame();
@@ -16,30 +18,30 @@ function createVNAWindow() {
     html: "<div id='vna_content' style='padding:10px;font-size:12px;color:darkgray;'></div><button style='padding:10px;font-size:12px;bottom: 0;right: 0;position: absolute;color: black' id='vna_downloadAll'>Download All</button>"
   });
 
-  // Bring to front
-  const links = document.getElementsByTagName('div');
-  const len = links.length;
-  const str = '';
-  for (let i = 0; i < len; i++) {
-    if (links[i].id.includes('jsFrame_fixed')) {
-      links[i].style.zIndex = '9999999';
-    };
-  }
+  // Bring window to front
+  frame.parentCanvas.parentElement.style.zIndex = '9999999';
 
   frame.show();
 }
 
-function getSubtitle(url, name, id, callBackFn) {
-  var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open("GET", url, false); // false for synchronous request
-  xmlHttp.send(null);
-  callBackFn(name, id, xmlHttp.responseText);
+async function getSubtitle(url, name, id, callBackFn) {
+  try {
+    const fetchUrl = new URL(url);
+    fetchUrl.searchParams.append('vna_request', 'true');
+    const response = await fetch(fetchUrl.href);
+    const data = await response.text();
+    callBackFn(name, id, data);
+  } catch (error) {
+    console.error(`Failed to download subtitle from ${url}:`, error);
+  }
 }
 
 function createDownloadButton(name, id, data) {
-  var blob = new Blob([data], {
-    type: 'text/vtt'
+  const blob = new Blob([data], {
+    type: 'text/plain'
   });
+
+  subtitleBlobs.set(id, { name, blob });
 
   const aTag = document.createElement('a');
   aTag.className = 'vna_link';
@@ -54,15 +56,11 @@ function createDownloadButton(name, id, data) {
 }
 
 function downloadAll() {
-  const urls = document.getElementsByClassName('vna_link');
-  for (let url of urls) {
-    fetch(url.href)
-      .then(res => res.blob())
-      .then(blob => {
-        saveAs(blob, url.download);
-      });
+  for (const { name, blob } of subtitleBlobs.values()) {
+    saveAs(blob, name);
   }
   clearElement('vna_content');
+  subtitleBlobs.clear();
 }
 
 function clearElement(id) {

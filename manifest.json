@@ -2,40 +2,18 @@
   "manifest_version": 3,
   "name": "Subtitle Downloader",
   "description": "Never miss a subtitle again!",
-  "version": "0.1",
+  "version": "0.2",
   "content_scripts": [
     {
       "js": [
         "scripts/FileSaver.min.js",
         "scripts/jsframe.min.js",
-        "scripts/content.js"
+        "scripts/content.js",
+        "scripts/providers.js",
+        "scripts/main.js"
       ],
       "matches": [
         "<all_urls>"
-      ]
-    },
-    {
-      "js": [
-        "scripts/crunchyroll.js"
-      ],
-      "matches": [
-        "https://www.crunchyroll.com/watch/*"
-      ]
-    },
-    {
-      "js": [
-        "scripts/vieon.js"
-      ],
-      "matches": [
-        "https://vieon.vn/*"
-      ]
-    },
-    {
-      "js": [
-        "scripts/fptplay.js"
-      ],
-      "matches": [
-        "https://fptplay.vn/*"
       ]
     }
   ],
